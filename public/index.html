@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student & Faculty Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Login Component
+        const Login = ({ onLogin }) => {
+            const [formData, setFormData] = useState({
+                email: '',
+                password: ''
+            });
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                // Simulate login for demo
+                setTimeout(() => {
+                    onLogin({
+                        id: 1,
+                        name: 'Admin User',
+                        email: formData.email,
+                        role: 'admin'
+                    }, 'demo-token');
+                    setLoading(false);
+                }, 1000);
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-md w-full space-y-8">
+                        <div>
+                            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                                Admin Login
+                            </h2>
+                            <p className="mt-2 text-center text-sm text-gray-600">
+                                Student & Faculty Management System
+                            </p>
+                        </div>
+                        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                                    {error}
+                                </div>
+                            )}
+                            <div className="rounded-md shadow-sm -space-y-px">
+                                <div>
+                                    <label htmlFor="email" className="sr-only">
+                                        Email address
+                                    </label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        required
+                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                        placeholder="Email address"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="password" className="sr-only">
+                                        Password
+                                    </label>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        required
+                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                        placeholder="Password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                >
+                                    {loading ? 'Signing in...' : 'Sign in'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = () => {
+            return (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white overflow-hidden shadow rounded-lg">
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt className="text-sm font-medium text-gray-500 truncate">
+                                                Total Students
+                                            </dt>
+                                            <dd className="text-lg font-medium text-gray-900">
+                                                150
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white overflow-hidden shadow rounded-lg">
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt className="text-sm font-medium text-gray-500 truncate">
+                                                Total Faculty
+                                            </dt>
+                                            <dd className="text-lg font-medium text-gray-900">
+                                                25
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                Students per Course
+                            </h3>
+                            <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
+                                <p className="text-gray-500">Chart would be displayed here</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                Faculty per Department
+                            </h3>
+                            <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
+                                <p className="text-gray-500">Chart would be displayed here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Students Component
+        const Students = () => {
+            const [students] = useState([
+                { id: 1, name: 'John Doe', email: 'john@example.com', course: 'Computer Science', year: '2nd Year' },
+                { id: 2, name: 'Jane Smith', email: 'jane@example.com', course: 'Information Technology', year: '3rd Year' },
+                { id: 3, name: 'Bob Johnson', email: 'bob@example.com', course: 'Business Administration', year: '1st Year' }
+            ]);
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-gray-900">Students Management</h2>
+                        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            Add Student
+                        </button>
+                    </div>
+
+                    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                        <ul className="divide-y divide-gray-200">
+                            {students.map((student) => (
+                                <li key={student.id}>
+                                    <div className="px-4 py-4 flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0 h-10 w-10">
+                                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        {student.name.split(' ').map(n => n[0]).join('')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="ml-4">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {student.name}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {student.course} • {student.year}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {student.email}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <button className="text-blue-600 hover:text-blue-900">
+                                                Edit
+                                            </button>
+                                            <button className="text-red-600 hover:text-red-900">
+                                                Archive
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            );
+        };
+
+        // Faculty Component
+        const Faculty = () => {
+            const [faculty] = useState([
+                { id: 1, name: 'Dr. Sarah Wilson', email: 'sarah@example.com', department: 'Computer Science', position: 'Professor' },
+                { id: 2, name: 'Prof. Mike Brown', email: 'mike@example.com', department: 'Information Technology', position: 'Associate Professor' },
+                { id: 3, name: 'Dr. Lisa Davis', email: 'lisa@example.com', department: 'Business Administration', position: 'Assistant Professor' }
+            ]);
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-gray-900">Faculty Management</h2>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            Add Faculty
+                        </button>
+                    </div>
+
+                    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                        <ul className="divide-y divide-gray-200">
+                            {faculty.map((member) => (
+                                <li key={member.id}>
+                                    <div className="px-4 py-4 flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0 h-10 w-10">
+                                                <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        {member.name.split(' ').map(n => n[0]).join('')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="ml-4">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {member.name}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {member.department} • {member.position}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {member.email}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <button className="text-blue-600 hover:text-blue-900">
+                                                Edit
+                                            </button>
+                                            <button className="text-red-600 hover:text-red-900">
+                                                Archive
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [activeTab, setActiveTab] = useState('dashboard');
+
+            const login = (userData, token) => {
+                setUser(userData);
+            };
+
+            const logout = () => {
+                setUser(null);
+                setActiveTab('dashboard');
+            };
+
+            const renderContent = () => {
+                if (!user) {
+                    return <Login onLogin={login} />;
+                }
+
+                switch (activeTab) {
+                    case 'dashboard':
+                        return <Dashboard />;
+                    case 'students':
+                        return <Students />;
+                    case 'faculty':
+                        return <Faculty />;
+                    default:
+                        return <Dashboard />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    {user && (
+                        <nav className="bg-white shadow-sm border-b">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="flex justify-between h-16">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0 flex items-center">
+                                            <h1 className="text-xl font-semibold text-gray-900">
+                                                Student & Faculty Management
+                                            </h1>
+                                        </div>
+                                        <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                                            {[
+                                                { id: 'dashboard', label: 'Dashboard' },
+                                                { id: 'students', label: 'Students' },
+                                                { id: 'faculty', label: 'Faculty' }
+                                            ].map((tab) => (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => setActiveTab(tab.id)}
+                                                    className={`${
+                                                        activeTab === tab.id
+                                                            ? 'border-blue-500 text-gray-900'
+                                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                    } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm`}
+                                                >
+                                                    {tab.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="text-sm text-gray-700">
+                                            Welcome, {user.name}
+                                        </span>
+                                        <button
+                                            onClick={logout}
+                                            className="ml-4 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </nav>
+                    )}
+                    
+                    <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {renderContent()}
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('app'));
+    </script>
+</body>
+</html>
+
